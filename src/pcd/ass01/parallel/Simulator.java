@@ -48,6 +48,15 @@ public class Simulator {
 		Latch latch = new RealLatch(partitions.size());
 
 		SimulationData simulationData = new SimulationData(bodies, bounds, dt, nSteps);
+
+
+		/* display current stage */
+		viewer.display(
+				simulationData.getBodies(),
+				simulationData.getVt(),
+				simulationData.getIterationsCount(),
+				simulationData.getBounds()
+		);
 		for (List<Body> partition : partitions) {
 			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, endIterationBarrier, latch);
 			workers.add(worker);
@@ -67,7 +76,12 @@ public class Simulator {
 				simulationData.nextIteration();
 
 				/* display current stage */
-				viewer.display(simulationData);
+				viewer.display(
+						simulationData.getBodies(),
+						simulationData.getVt(),
+						simulationData.getIterationsCount(),
+						simulationData.getBounds()
+				);
 				endIterationBarrier.await();
 				endIterationBarrier.reset();
 			} catch (Exception e) {

@@ -4,6 +4,7 @@ import pcd.ass01.model.Body;
 import pcd.ass01.model.Boundary;
 import pcd.ass01.model.P2d;
 import pcd.ass01.model.SimulationDisplay;
+import pcd.ass01.parallel.SimulationData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,9 +34,10 @@ public class SimulationView implements SimulationDisplay {
     public SimulationView(int w, int h){
     	frame = new VisualiserFrame(w,h);
     }
-        
+
+	@Override
     public void display(Collection<Body> bodies, double vt, long iter, Boundary bounds){
- 	   frame.display(bodies, vt, iter, bounds); 
+ 	   frame.display(bodies, vt, iter, bounds);
     }
 
 	public void addListener(InputListener l){
@@ -46,7 +48,8 @@ public class SimulationView implements SimulationDisplay {
 		frame.removeListener(l);
 	}
 
-    public static class VisualiserFrame extends JFrame implements KeyListener {
+
+	public static class VisualiserFrame extends JFrame implements KeyListener {
 
         private VisualiserPanel panel;
 		private final ArrayList<InputListener> listeners = new ArrayList<>();
