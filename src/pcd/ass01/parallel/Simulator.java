@@ -1,14 +1,15 @@
 package pcd.ass01.parallel;
 
 import pcd.ass01.model.*;
+import pcd.ass01.parallel.monitor.CyclicBarrier;
+import pcd.ass01.parallel.monitor.RealCyclicBarrier;
+import pcd.ass01.parallel.monitor.StartSynchronized;
 import pcd.ass01.parallel.monitor.latch.Latch;
 import pcd.ass01.parallel.monitor.latch.RealLatch;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 public class Simulator {
 
@@ -23,6 +24,10 @@ public class Simulator {
 	/* virtual time step */
 	double dt;
 
+	private boolean isRunning = false;
+	StartSynchronized startSynchronized = new StartSynchronized();
+	Latch latch;
+
 	public Simulator(SimulationDisplay viewer) {
 		this.viewer = viewer;
 
@@ -34,7 +39,7 @@ public class Simulator {
 		testBodySet4_many_bodies();
 	}
 	
-	public void execute(long nSteps) {
+	public void configure(long nSteps) {
 		dt = 0.001;
 		int nWorkers = Runtime.getRuntime().availableProcessors();
 
@@ -43,9 +48,8 @@ public class Simulator {
 		Partitions<Body> partitions = Partitions.ofSize(bodies, partitionSize);
 		List<Worker> workers = new ArrayList<>();
 
-		CyclicBarrier endForceComputationBarrier = new CyclicBarrier(partitions.size() + 1);
-		CyclicBarrier endIterationBarrier = new CyclicBarrier(partitions.size() + 1);
-		Latch latch = new RealLatch(partitions.size());
+		CyclicBarrier endForceComputationBarrier = new RealCyclicBarrier(partitions.size() + 1);
+		latch = new RealLatch(partitions.size());
 
 		SimulationData simulationData = new SimulationData(bodies, bounds, dt, nSteps);
 
@@ -58,7 +62,7 @@ public class Simulator {
 				simulationData.getBounds()
 		);
 		for (List<Body> partition : partitions) {
-			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, endIterationBarrier, latch);
+			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, latch, startSynchronized);
 			workers.add(worker);
 			worker.start();
 		}
@@ -68,9 +72,15 @@ public class Simulator {
 		while (!simulationData.isOver()) {
 
 			try {
-				endForceComputationBarrier.await();
+				if(isRunning) {
+					startSynchronized.notifyStarted();
+				} else {
+					startSynchronized.waitStart();
+				}
+				endForceComputationBarrier.hitAndWaitAll();
 				endForceComputationBarrier.reset();
 				latch.await();
+				latch.resetCount();
 
 				/* update virtual time */
 				simulationData.nextIteration();
@@ -82,12 +92,20 @@ public class Simulator {
 						simulationData.getIterationsCount(),
 						simulationData.getBounds()
 				);
-				endIterationBarrier.await();
-				endIterationBarrier.reset();
+				startSynchronized.stop();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+	public synchronized void playSimulation() {
+		if (isRunning) return;
+		isRunning = true;
+		startSynchronized.notifyStarted();
+	}
+	public synchronized void pauseSimulation() {
+		if (!isRunning) return;
+		isRunning = false;
 	}
 	private void testBodySet1_two_bodies() {
 		bounds = new Boundary(-4.0, -4.0, 4.0, 4.0);

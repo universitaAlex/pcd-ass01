@@ -1,32 +1,26 @@
 package pcd.ass01.parallel;
 
 import pcd.ass01.model.Body;
-import pcd.ass01.model.Boundary;
 import pcd.ass01.model.V2d;
-import pcd.ass01.parallel.monitor.Barrier;
+import pcd.ass01.parallel.monitor.CyclicBarrier;
+import pcd.ass01.parallel.monitor.StartSynchronized;
 import pcd.ass01.parallel.monitor.latch.Latch;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 public class Worker extends Thread {
 
+	private final StartSynchronized startSynchronized;
 	private final SimulationData data;
 	private final Iterable<Body> myBodies;
 	private final CyclicBarrier endForceComputationBarrier;
-	private final CyclicBarrier endIterationBarrier;
 	private final Latch latch;
 
-	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier,CyclicBarrier endIterationBarrier, Latch latch) {
+	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, StartSynchronized startSynchronized) {
 		super(name);
 		this.data = data;
 		this.myBodies = myBodies;
 		this.endForceComputationBarrier = endForceComputationBarrier;
-		this.endIterationBarrier = endIterationBarrier;
 		this.latch = latch;
+		this.startSynchronized = startSynchronized;
 	}
 
 	public void run() {
@@ -34,7 +28,7 @@ public class Worker extends Thread {
 		/* simulation loop */
 
 		while (!data.isOver()) {
-
+			startSynchronized.waitStart();
 			/* update bodies velocity */
 
 			for (Body b : myBodies) {
@@ -49,12 +43,8 @@ public class Worker extends Thread {
 				b.updateVelocity(acc, data.getDt());
 			}
 
-			try {
-				endForceComputationBarrier.await();
-			} catch (BrokenBarrierException | InterruptedException e) {
-				e.printStackTrace();
-				//TODO
-			}
+			endForceComputationBarrier.hitAndWaitAll();
+
 			/* compute bodies new pos and check collisions with boundaries */
 
 			for (Body b : myBodies) {
@@ -62,14 +52,7 @@ public class Worker extends Thread {
 				b.checkAndSolveBoundaryCollision(data.getBounds());
 			}
 
-			try {
-				latch.countDown();
-				endIterationBarrier.await();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (BrokenBarrierException e) {
-				e.printStackTrace();
-			}
+			latch.countDown();
 		}
 	}
 

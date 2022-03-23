@@ -15,7 +15,9 @@ public class ParallelBodySimulationMain {
     public static void main(String[] args) {
         SimulationView viewer = new SimulationView(620,620);
         Simulator sim = new Simulator(viewer);
-        sim.execute(5000);
+        Controller controller = new Controller(sim);
+        viewer.addListener(controller);
+        sim.configure(5000);
     }
 
     private static void testSpeedMain() {
@@ -26,7 +28,7 @@ public class ParallelBodySimulationMain {
             long start = System.nanoTime();
 
             Simulator sim = new Simulator(new ConsoleSimulationDisplay());
-            sim.execute(2000);
+            sim.configure(2000);
 
             long end = System.nanoTime();
             long elapsedTime = end - start;

@@ -20,7 +20,7 @@ public class RealLatch implements Latch {
     }
 
     @Override
-    public void resetCount() {
+    public synchronized void resetCount() {
         this.currentCount = 0;
     }
 
