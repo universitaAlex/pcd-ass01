@@ -4,14 +4,10 @@ import pcd.ass01.model.Body;
 import pcd.ass01.model.Boundary;
 import pcd.ass01.model.P2d;
 import pcd.ass01.model.SimulationDisplay;
-import pcd.ass01.parallel.SimulationData;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -49,16 +45,17 @@ public class SimulationView implements SimulationDisplay {
 	}
 
 
-	public static class VisualiserFrame extends JFrame implements KeyListener {
+	public static class VisualiserFrame extends JFrame {
+		private static final String MOVE_UP = "move up";
+		private static final String MOVE_DOWN = "move down";
 
-        private VisualiserPanel panel;
+        private final VisualiserPanel panel;
 		private final ArrayList<InputListener> listeners = new ArrayList<>();
 
         public VisualiserFrame(int w, int h){
             setTitle("Bodies Simulation");
             setSize(w,h);
             setResizable(false);
-			setFocusable(true);
 			setFocusTraversalKeysEnabled(false);
 			requestFocusInWindow();
 			panel = new VisualiserPanel(w,h);
@@ -93,7 +90,6 @@ public class SimulationView implements SimulationDisplay {
 			cp.add(panel, panelCons);
 			cp.add(buttonsPanel, buttonsConstraints);
 			setContentPane(cp);
-			this.addKeyListener(this);
 
 			addWindowListener(new WindowAdapter(){
     			public void windowClosing(WindowEvent ev){
@@ -104,8 +100,26 @@ public class SimulationView implements SimulationDisplay {
     			}
     		});
     		this.setVisible(true);
+			setupKeystrokeActions();
         }
 
+		private void setupKeystrokeActions() {
+			InputMap inputMap = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+			inputMap.put(KeyStroke.getKeyStroke("UP"), MOVE_UP);
+			inputMap.put(KeyStroke.getKeyStroke("DOWN"), MOVE_DOWN);
+			panel.getActionMap().put(MOVE_UP, new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					updateScale(1.1);
+				}
+			});
+			panel.getActionMap().put(MOVE_DOWN, new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					updateScale(0.9);
+				}
+			});
+		}
         public void display(Collection<Body> bodies, double vt, long iter, Boundary bounds){
         	try {
 	        	SwingUtilities.invokeAndWait(() -> {
@@ -116,7 +130,8 @@ public class SimulationView implements SimulationDisplay {
         }
         
         public void updateScale(double k) {
-        	panel.updateScale(k);
+			System.out.println("Setting scale 1: " + k);
+			panel.updateScale(k);
         }
 
 		public void addListener(InputListener l){
@@ -126,18 +141,6 @@ public class SimulationView implements SimulationDisplay {
 		public void removeListener(InputListener l){
 			listeners.remove(l);
 		}
-
-		@Override
-		public void keyPressed(KeyEvent e) {
-			if (e.getKeyCode() == 38){  		/* KEY UP */
-				panel.scale *= 1.1;
-			} else if (e.getKeyCode() == 40){  	/* KEY DOWN */
-				panel.scale *= 0.9;
-			}
-		}
-
-		public void keyReleased(KeyEvent e) {}
-		public void keyTyped(KeyEvent e) {}
     }
 
     public static class VisualiserPanel extends JPanel {
@@ -153,13 +156,15 @@ public class SimulationView implements SimulationDisplay {
         private long dy;
         
         public VisualiserPanel(int w, int h){
+			System.out.println("Drawing VisualiserPanel!");
             setSize(w,h);
             dx = w/2 - 20;
             dy = h/2 - 20;
-        }
+		}
 
         public void paint(Graphics g){    		    		
     		if (bodies != null) {
+				System.out.println("Re evaluate");
         		Graphics2D g2 = (Graphics2D) g;
         		
         		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -191,11 +196,13 @@ public class SimulationView implements SimulationDisplay {
         }
         
         private int getXcoord(double x) {
+			System.out.println("Scale " + scale);
         	return (int)(dx + x*dx*scale);
         }
 
         private int getYcoord(double y) {
-        	return (int)(dy - y*dy*scale);
+			System.out.println("Scale " + scale);
+			return (int)(dy - y*dy*scale);
         }
         
         public void display(Collection<Body> bodies, double vt, long iter, Boundary bounds){
@@ -207,6 +214,7 @@ public class SimulationView implements SimulationDisplay {
         
         public void updateScale(double k) {
         	scale *= k;
+			repaint();
         }
     }
 }
