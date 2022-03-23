@@ -16,14 +16,16 @@ public class Worker extends Thread {
 
 	private final SimulationData data;
 	private final Iterable<Body> myBodies;
-	private final CyclicBarrier barrier;
+	private final CyclicBarrier endForceComputationBarrier;
+	private final CyclicBarrier endIterationBarrier;
 	private final Latch latch;
 
-	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier barrier, Latch latch) {
+	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier,CyclicBarrier endIterationBarrier, Latch latch) {
 		super(name);
 		this.data = data;
 		this.myBodies = myBodies;
-		this.barrier = barrier;
+		this.endForceComputationBarrier = endForceComputationBarrier;
+		this.endIterationBarrier = endIterationBarrier;
 		this.latch = latch;
 	}
 
@@ -48,7 +50,7 @@ public class Worker extends Thread {
 			}
 
 			try {
-				barrier.await();
+				endForceComputationBarrier.await();
 			} catch (BrokenBarrierException | InterruptedException e) {
 				e.printStackTrace();
 				//TODO
@@ -62,7 +64,7 @@ public class Worker extends Thread {
 
 			try {
 				latch.countDown();
-				barrier.await();
+				endIterationBarrier.await();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (BrokenBarrierException e) {
