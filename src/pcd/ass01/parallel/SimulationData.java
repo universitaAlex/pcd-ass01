@@ -10,10 +10,10 @@ public class SimulationData {
     private final Boundary bounds;
     private double vt = 0;
     private final double dt;
-    private final int maxIterationsCount;
-    private int iterationsCount = 0;
+    private final long maxIterationsCount;
+    private long iterationsCount = 0;
 
-    public SimulationData(List<Body> bodies, Boundary bounds, double dt, int maxIterationsCount) {
+    public SimulationData(List<Body> bodies, Boundary bounds, double dt, long maxIterationsCount) {
         this.bodies = bodies;
         this.bounds = bounds;
         this.dt = dt;
@@ -36,11 +36,11 @@ public class SimulationData {
         return dt;
     }
 
-    public int getMaxIterationsCount() {
+    public long getMaxIterationsCount() {
         return maxIterationsCount;
     }
 
-    public int getIterationsCount() {
+    public long getIterationsCount() {
         return iterationsCount;
     }
 
