@@ -1,8 +1,9 @@
-package pcd.ass01.parallel;
+package pcd.ass01.ui;
 
 import pcd.ass01.model.Body;
 import pcd.ass01.model.Boundary;
 import pcd.ass01.model.P2d;
+import pcd.ass01.model.SimulationDisplay;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +12,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Simulation view
@@ -18,7 +20,7 @@ import java.util.ArrayList;
  * @author aricci
  *
  */
-public class SimulationView {
+public class SimulationView implements SimulationDisplay {
         
 	private VisualiserFrame frame;
 	
@@ -32,10 +34,10 @@ public class SimulationView {
     	frame = new VisualiserFrame(w,h);
     }
         
-    public void display(ArrayList<Body> bodies, double vt, long iter, Boundary bounds){
+    public void display(Collection<Body> bodies, double vt, long iter, Boundary bounds){
  	   frame.display(bodies, vt, iter, bounds); 
     }
-    
+
     public static class VisualiserFrame extends JFrame {
 
         private VisualiserPanel panel;
@@ -57,7 +59,7 @@ public class SimulationView {
     		this.setVisible(true);
         }
         
-        public void display(ArrayList<Body> bodies, double vt, long iter, Boundary bounds){
+        public void display(Collection<Body> bodies, double vt, long iter, Boundary bounds){
         	try {
 	        	SwingUtilities.invokeAndWait(() -> {
 	        		panel.display(bodies, vt, iter, bounds);
@@ -73,7 +75,7 @@ public class SimulationView {
 
     public static class VisualiserPanel extends JPanel implements KeyListener {
         
-    	private ArrayList<Body> bodies;
+    	private Collection<Body> bodies;
     	private Boundary bounds;
     	
     	private long nIter;
@@ -133,7 +135,7 @@ public class SimulationView {
         	return (int)(dy - y*dy*scale);
         }
         
-        public void display(ArrayList<Body> bodies, double vt, long iter, Boundary bounds){
+        public void display(Collection<Body> bodies, double vt, long iter, Boundary bounds){
             this.bodies = bodies;
             this.bounds = bounds;
             this.vt = vt;

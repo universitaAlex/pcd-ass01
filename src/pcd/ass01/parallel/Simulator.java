@@ -1,16 +1,14 @@
 package pcd.ass01.parallel;
 
-import pcd.ass01.model.Body;
-import pcd.ass01.model.Boundary;
-import pcd.ass01.model.P2d;
-import pcd.ass01.model.V2d;
+import pcd.ass01.model.*;
+import pcd.ass01.ui.SimulationView;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Simulator {
 
-	private SimulationView viewer;
+	private SimulationDisplay viewer;
 
 	/* bodies in the field */
 	ArrayList<Body> bodies;
@@ -24,7 +22,7 @@ public class Simulator {
 	/* virtual time step */
 	double dt;
 
-	public Simulator(SimulationView viewer) {
+	public Simulator(SimulationDisplay viewer) {
 		this.viewer = viewer;
 
 		/* initializing boundary and bodies */

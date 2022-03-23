@@ -1,5 +1,7 @@
 package pcd.ass01.seq;
 
+import pcd.ass01.ui.SimulationView;
+
 /**
  * Bodies simulation - legacy code: sequential, unstructured
  * 

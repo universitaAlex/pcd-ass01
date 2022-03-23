@@ -1,15 +1,12 @@
 package pcd.ass01.seq;
 
-import pcd.ass01.model.Body;
-import pcd.ass01.model.Boundary;
-import pcd.ass01.model.P2d;
-import pcd.ass01.model.V2d;
+import pcd.ass01.model.*;
 
 import java.util.*;
 
 public class Simulator {
 
-	private SimulationView viewer;
+	private SimulationDisplay viewer;
 
 	/* bodies in the field */
 	ArrayList<Body> bodies;
@@ -23,7 +20,7 @@ public class Simulator {
 	/* virtual time step */
 	double dt;
 
-	public Simulator(SimulationView viewer) {
+	public Simulator(SimulationDisplay viewer) {
 		this.viewer = viewer;
 
 		/* initializing boundary and bodies */
