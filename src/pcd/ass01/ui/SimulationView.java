@@ -38,7 +38,7 @@ public class SimulationView implements SimulationDisplay {
  	   frame.display(bodies, vt, iter, bounds); 
     }
 
-    public static class VisualiserFrame extends JFrame {
+    public static class VisualiserFrame extends JFrame implements KeyListener {
 
         private VisualiserPanel panel;
 
@@ -46,9 +46,31 @@ public class SimulationView implements SimulationDisplay {
             setTitle("Bodies Simulation");
             setSize(w,h);
             setResizable(false);
-            panel = new VisualiserPanel(w,h);
-            getContentPane().add(panel);
-            addWindowListener(new WindowAdapter(){
+			setFocusable(true);
+			setFocusTraversalKeysEnabled(false);
+			requestFocusInWindow();
+			panel = new VisualiserPanel(w,h);
+
+			JPanel buttonsPanel = new JPanel();
+			buttonsPanel.setLayout(new FlowLayout());
+			buttonsPanel.add(new JButton("Play"));
+			buttonsPanel.add(new JButton("Pause"));
+
+			GridBagConstraints panelCons = new GridBagConstraints();
+			panelCons.fill = GridBagConstraints.BOTH;
+			panelCons.weightx = 1;
+			panelCons.weighty = 1;
+			panelCons.gridx = 0;
+			panelCons.gridy = 0;
+			GridBagConstraints buttonsConstraints = new GridBagConstraints();
+			buttonsConstraints.gridx = 0;
+			JPanel cp = new JPanel(new GridBagLayout());
+			cp.add(panel, panelCons);
+			cp.add(buttonsPanel, buttonsConstraints);
+			setContentPane(cp);
+			this.addKeyListener(this);
+
+			addWindowListener(new WindowAdapter(){
     			public void windowClosing(WindowEvent ev){
     				System.exit(-1);
     			}
@@ -58,7 +80,7 @@ public class SimulationView implements SimulationDisplay {
     		});
     		this.setVisible(true);
         }
-        
+
         public void display(Collection<Body> bodies, double vt, long iter, Boundary bounds){
         	try {
 	        	SwingUtilities.invokeAndWait(() -> {
@@ -70,10 +92,22 @@ public class SimulationView implements SimulationDisplay {
         
         public void updateScale(double k) {
         	panel.updateScale(k);
-        }    	
+        }
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if (e.getKeyCode() == 38){  		/* KEY UP */
+				panel.scale *= 1.1;
+			} else if (e.getKeyCode() == 40){  	/* KEY DOWN */
+				panel.scale *= 0.9;
+			}
+		}
+
+		public void keyReleased(KeyEvent e) {}
+		public void keyTyped(KeyEvent e) {}
     }
 
-    public static class VisualiserPanel extends JPanel implements KeyListener {
+    public static class VisualiserPanel extends JPanel {
         
     	private Collection<Body> bodies;
     	private Boundary bounds;
@@ -89,10 +123,6 @@ public class SimulationView implements SimulationDisplay {
             setSize(w,h);
             dx = w/2 - 20;
             dy = h/2 - 20;
-			this.addKeyListener(this);
-			setFocusable(true);
-			setFocusTraversalKeysEnabled(false);
-			requestFocusInWindow(); 
         }
 
         public void paint(Graphics g){    		    		
@@ -145,17 +175,5 @@ public class SimulationView implements SimulationDisplay {
         public void updateScale(double k) {
         	scale *= k;
         }
-
-		@Override
-		public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == 38){  		/* KEY UP */
-					scale *= 1.1;
-				} else if (e.getKeyCode() == 40){  	/* KEY DOWN */
-					scale *= 0.9;  
-				} 
-		}
-
-		public void keyReleased(KeyEvent e) {}
-		public void keyTyped(KeyEvent e) {}
     }
 }
