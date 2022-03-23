@@ -9,6 +9,7 @@ import pcd.ass01.parallel.monitor.latch.Latch;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 public class Worker extends Thread {
@@ -27,16 +28,10 @@ public class Worker extends Thread {
 	}
 
 	public void run() {
-		/* init virtual time */
-
-		vt = 0;
-		dt = 0.001;
-
-		long iter = 0;
 
 		/* simulation loop */
 
-		while (iter < nSteps) {
+		while (!data.isOver()) {
 
 			/* update bodies velocity */
 
@@ -49,41 +44,30 @@ public class Worker extends Thread {
 				V2d acc = new V2d(totalForce).scalarMul(1.0 / b.getMass());
 
 				/* update velocity */
-				b.updateVelocity(acc, dt);
+				b.updateVelocity(acc, data.getDt());
 			}
 
 			try {
-				barrier.hitAndWaitAll();
-			} catch (InterruptedException e) {
+				barrier.await();
+			} catch (BrokenBarrierException | InterruptedException e) {
 				e.printStackTrace();
 				//TODO
 			}
-			log("force");
 			/* compute bodies new pos and check collisions with boundaries */
 
 			for (Body b : myBodies) {
-				b.updatePos(dt);
-				b.checkAndSolveBoundaryCollision(bounds);
+				b.updatePos(data.getDt());
+				b.checkAndSolveBoundaryCollision(data.getBounds());
 			}
 
 			try {
-				barrier.hitAndWaitAll();
+				latch.countDown();
+				barrier.await();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
-			/* update virtual time */
-			log("collision");
-			vt = vt + dt;
-			iter++;
-
-			/* display current stage */
-			try {
-				barrier.hitAndWaitAll();
-			} catch (InterruptedException e) {
+			} catch (BrokenBarrierException e) {
 				e.printStackTrace();
 			}
-			log("display");
-			//viewer.display(bodies, vt, iter, bounds);
 		}
 	}
 
@@ -93,8 +77,8 @@ public class Worker extends Thread {
 
 		/* compute total repulsive force */
 
-		for (int j = 0; j < bodies.size(); j++) {
-			Body otherBody = bodies.get(j);
+		for (int j = 0; j < data.getBodies().size(); j++) {
+			Body otherBody = data.getBodies().get(j);
 			if (!b.equals(otherBody)) {
 				try {
 					V2d forceByOtherBody = b.computeRepulsiveForceBy(otherBody);
