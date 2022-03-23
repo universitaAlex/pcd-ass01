@@ -13,17 +13,28 @@ import java.util.concurrent.TimeUnit;
 public class ParallelBodySimulationMain {
 
     public static void main(String[] args) {
+        SimulationView viewer = new SimulationView(620,620);
+        Simulator sim = new Simulator(viewer);
+        sim.execute(5000);
+    }
+
+    private static void testSpeedMain() {
+        int nExecution = 10;
         //SimulationView viewer = new SimulationView(620,620);
-        long start = System.nanoTime();
+        double elapsedTimeSum = 0;
+        for (int i = 0; i < nExecution; i++) {
+            long start = System.nanoTime();
 
-        Simulator sim = new Simulator(new ConsoleSimulationDisplay());
-        sim.execute(50000);
+            Simulator sim = new Simulator(new ConsoleSimulationDisplay());
+            sim.execute(2000);
 
-        long end = System.nanoTime();
-        long elapsedTime = end - start;
+            long end = System.nanoTime();
+            long elapsedTime = end - start;
 
-        long elapsedTimeSeconds = TimeUnit.SECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS);
-
-        System.out.println("Elapsed time: " + (elapsedTimeSeconds));
+            double elapsedTimeSeconds = TimeUnit.MILLISECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS) / 1000.0;
+            elapsedTimeSum+=elapsedTimeSeconds;
+        }
+        double elapsedTimeAvg = elapsedTimeSum/nExecution;
+        System.out.println("Elapsed time: " + (elapsedTimeAvg) + " s");
     }
 }

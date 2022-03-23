@@ -36,7 +36,7 @@ public class Simulator {
 	
 	public void execute(long nSteps) {
 		dt = 0.001;
-		int nWorkers = Runtime.getRuntime().availableProcessors()-1;
+		int nWorkers = Runtime.getRuntime().availableProcessors();
 
 		int partitionSize = nWorkers > bodies.size() ? 1: (int) Math.ceil(bodies.size()/(double) nWorkers);
 
@@ -62,19 +62,19 @@ public class Simulator {
 				endForceComputationBarrier.await();
 				endForceComputationBarrier.reset();
 				latch.await();
+
+				/* update virtual time */
+				simulationData.nextIteration();
+
+				/* display current stage */
+				viewer.display(simulationData);
+				endIterationBarrier.await();
+				endIterationBarrier.reset();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
-			/* update virtual time */
-			simulationData.nextIteration();
-
-			/* display current stage */
-			viewer.display(simulationData);
-
 		}
 	}
-	
 	private void testBodySet1_two_bodies() {
 		bounds = new Boundary(-4.0, -4.0, 4.0, 4.0);
 		bodies = new ArrayList<Body>();
