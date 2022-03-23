@@ -195,7 +195,6 @@ public class SimulationView implements SimulationDisplay {
         }
         
         private int getXcoord(double x) {
-			System.out.println("Scale " + scale);
         	return (int)(dx + x*dx*scale);
         }
 
