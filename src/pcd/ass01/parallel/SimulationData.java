@@ -40,7 +40,7 @@ public class SimulationData {
         return maxIterationsCount;
     }
 
-    public long getIterationsCount() {
+    public long getCurrentIteration() {
         return iterationsCount;
     }
 

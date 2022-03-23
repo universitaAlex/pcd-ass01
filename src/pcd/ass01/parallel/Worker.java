@@ -3,32 +3,33 @@ package pcd.ass01.parallel;
 import pcd.ass01.model.Body;
 import pcd.ass01.model.V2d;
 import pcd.ass01.parallel.monitor.CyclicBarrier;
-import pcd.ass01.parallel.monitor.StartSynchronized;
+import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.latch.Latch;
 
 public class Worker extends Thread {
 
-	private final StartSynchronized startSynchronized;
+	private final IterationTracker iterationTracker;
 	private final SimulationData data;
 	private final Iterable<Body> myBodies;
 	private final CyclicBarrier endForceComputationBarrier;
 	private final Latch latch;
 
-	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, StartSynchronized startSynchronized) {
+	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, IterationTracker iterationTracker) {
 		super(name);
 		this.data = data;
 		this.myBodies = myBodies;
 		this.endForceComputationBarrier = endForceComputationBarrier;
 		this.latch = latch;
-		this.startSynchronized = startSynchronized;
+		this.iterationTracker = iterationTracker;
 	}
 
 	public void run() {
 
 		/* simulation loop */
 
+		int iteration = 0;
 		while (!data.isOver()) {
-			startSynchronized.waitStart();
+			iterationTracker.waitIteration(iteration);
 			/* update bodies velocity */
 
 			for (Body b : myBodies) {
@@ -53,6 +54,7 @@ public class Worker extends Thread {
 			}
 
 			latch.countDown();
+			iteration++;
 		}
 	}
 

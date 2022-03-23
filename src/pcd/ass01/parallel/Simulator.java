@@ -2,8 +2,8 @@ package pcd.ass01.parallel;
 
 import pcd.ass01.model.*;
 import pcd.ass01.parallel.monitor.CyclicBarrier;
+import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.RealCyclicBarrier;
-import pcd.ass01.parallel.monitor.StartSynchronized;
 import pcd.ass01.parallel.monitor.latch.Latch;
 import pcd.ass01.parallel.monitor.latch.RealLatch;
 
@@ -24,8 +24,9 @@ public class Simulator {
 	/* virtual time step */
 	double dt;
 
+	private SimulationData simulationData;
 	private boolean isRunning = false;
-	StartSynchronized startSynchronized = new StartSynchronized();
+	IterationTracker iterationTracker = new IterationTracker();
 	Latch latch;
 
 	public Simulator(SimulationDisplay viewer) {
@@ -51,18 +52,18 @@ public class Simulator {
 		CyclicBarrier endForceComputationBarrier = new RealCyclicBarrier(partitions.size() + 1);
 		latch = new RealLatch(partitions.size());
 
-		SimulationData simulationData = new SimulationData(bodies, bounds, dt, nSteps);
+		simulationData = new SimulationData(bodies, bounds, dt, nSteps);
 
 
 		/* display current stage */
 		viewer.display(
 				simulationData.getBodies(),
 				simulationData.getVt(),
-				simulationData.getIterationsCount(),
+				simulationData.getCurrentIteration(),
 				simulationData.getBounds()
 		);
 		for (List<Body> partition : partitions) {
-			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, latch, startSynchronized);
+			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
 			workers.add(worker);
 			worker.start();
 		}
@@ -70,12 +71,11 @@ public class Simulator {
 		/* simulation loop */
 
 		while (!simulationData.isOver()) {
-
 			try {
 				if(isRunning) {
-					startSynchronized.notifyStarted();
+					iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
 				} else {
-					startSynchronized.waitStart();
+					iterationTracker.waitIteration(simulationData.getCurrentIteration());
 				}
 				endForceComputationBarrier.hitAndWaitAll();
 				endForceComputationBarrier.reset();
@@ -89,10 +89,9 @@ public class Simulator {
 				viewer.display(
 						simulationData.getBodies(),
 						simulationData.getVt(),
-						simulationData.getIterationsCount(),
+						simulationData.getCurrentIteration(),
 						simulationData.getBounds()
 				);
-				startSynchronized.stop();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -101,7 +100,7 @@ public class Simulator {
 	public synchronized void playSimulation() {
 		if (isRunning) return;
 		isRunning = true;
-		startSynchronized.notifyStarted();
+		iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
 	}
 	public synchronized void pauseSimulation() {
 		if (!isRunning) return;

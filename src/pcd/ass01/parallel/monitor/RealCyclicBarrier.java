@@ -14,6 +14,7 @@ public class RealCyclicBarrier implements CyclicBarrier {
 		this.nParticipants = nParticipants;
 		this.nHits=0;
 		this.nOut=0;
+		this.broken = false;
 	}
 	
 	@Override
