@@ -1,5 +1,7 @@
 package pcd.ass01.parallel.monitor;
 
+import java.util.concurrent.BrokenBarrierException;
+
 /*
  * Barrier - to be implemented
  */
@@ -18,9 +20,9 @@ public class RealCyclicBarrier implements CyclicBarrier {
 	}
 	
 	@Override
-	public synchronized void hitAndWaitAll() {
+	public synchronized void hitAndWaitAll() throws BrokenBarrierException {
 		if (this.broken) {
-			throw new IllegalStateException("Barrier is broken.");
+			throw new BrokenBarrierException();
 		}
 		nHits++;
 		while (nHits<nParticipants){

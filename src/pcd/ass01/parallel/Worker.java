@@ -6,6 +6,8 @@ import pcd.ass01.parallel.monitor.CyclicBarrier;
 import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.latch.Latch;
 
+import java.util.concurrent.BrokenBarrierException;
+
 public class Worker extends Thread {
 
 	private final IterationTracker iterationTracker;
@@ -44,7 +46,11 @@ public class Worker extends Thread {
 				b.updateVelocity(acc, data.getDt());
 			}
 
-			endForceComputationBarrier.hitAndWaitAll();
+			try {
+				endForceComputationBarrier.hitAndWaitAll();
+			} catch (BrokenBarrierException e) {
+				e.printStackTrace();
+			}
 
 			/* compute bodies new pos and check collisions with boundaries */
 
