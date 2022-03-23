@@ -130,7 +130,6 @@ public class SimulationView implements SimulationDisplay {
         }
         
         public void updateScale(double k) {
-			System.out.println("Setting scale 1: " + k);
 			panel.updateScale(k);
         }
 
@@ -201,7 +200,6 @@ public class SimulationView implements SimulationDisplay {
         }
 
         private int getYcoord(double y) {
-			System.out.println("Scale " + scale);
 			return (int)(dy - y*dy*scale);
         }
         
