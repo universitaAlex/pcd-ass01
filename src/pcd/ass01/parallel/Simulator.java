@@ -1,10 +1,14 @@
 package pcd.ass01.parallel;
 
 import pcd.ass01.model.*;
-import pcd.ass01.ui.SimulationView;
+import pcd.ass01.parallel.monitor.latch.Latch;
+import pcd.ass01.parallel.monitor.latch.RealLatch;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class Simulator {
 
@@ -15,9 +19,6 @@ public class Simulator {
 
 	/* boundary of the field */
 	private Boundary bounds;
-
-	/* virtual time */
-	private double vt;
 
 	/* virtual time step */
 	double dt;
@@ -34,53 +35,42 @@ public class Simulator {
 	}
 	
 	public void execute(long nSteps) {
-
-		/* init virtual time */
-
-		vt = 0;
 		dt = 0.001;
+		int nWorkers = Runtime.getRuntime().availableProcessors()-1;
 
-		long iter = 0;
+		int partitionSize = nWorkers > bodies.size() ? 1: (int) Math.ceil(bodies.size()/(double) nWorkers);
+
+		Partitions<Body> partitions = Partitions.ofSize(bodies, partitionSize);
+		List<Worker> workers = new ArrayList<>();
+
+		CyclicBarrier endForceComputationBarrier = new CyclicBarrier(partitions.size() + 1);
+		CyclicBarrier endIterationBarrier = new CyclicBarrier(partitions.size() + 1);
+		Latch latch = new RealLatch(partitions.size());
+
+		SimulationData simulationData = new SimulationData(bodies, bounds, dt, nSteps);
+		for (List<Body> partition : partitions) {
+			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, endIterationBarrier, latch);
+			workers.add(worker);
+			worker.start();
+		}
 
 		/* simulation loop */
 
-		while (iter < nSteps) {
+		while (!simulationData.isOver()) {
 
-			/* update bodies velocity */
-
-			for (int i = 0; i < bodies.size(); i++) {
-				Body b = bodies.get(i);
-
-				/* compute total force on bodies */
-				V2d totalForce = computeTotalForceOnBody(b);
-
-				/* compute instant acceleration */
-				V2d acc = new V2d(totalForce).scalarMul(1.0 / b.getMass());
-
-				/* update velocity */
-				b.updateVelocity(acc, dt);
-			}
-
-			/* compute bodies new pos */
-
-			for (Body b : bodies) {
-				b.updatePos(dt);
-			}
-
-			/* check collisions with boundaries */
-
-			for (Body b : bodies) {
-				b.checkAndSolveBoundaryCollision(bounds);
+			try {
+				endForceComputationBarrier.await();
+				endForceComputationBarrier.reset();
+				latch.await();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			/* update virtual time */
-
-			vt = vt + dt;
-			iter++;
+			simulationData.nextIteration();
 
 			/* display current stage */
-
-			viewer.display(bodies, vt, iter, bounds);
+			viewer.display(simulationData);
 
 		}
 	}
