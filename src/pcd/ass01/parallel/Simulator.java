@@ -84,29 +84,6 @@ public class Simulator {
 
 		}
 	}
-
-	private V2d computeTotalForceOnBody(Body b) {
-
-		V2d totalForce = new V2d(0, 0);
-
-		/* compute total repulsive force */
-
-		for (int j = 0; j < bodies.size(); j++) {
-			Body otherBody = bodies.get(j);
-			if (!b.equals(otherBody)) {
-				try {
-					V2d forceByOtherBody = b.computeRepulsiveForceBy(otherBody);
-					totalForce.sum(forceByOtherBody);
-				} catch (Exception ex) {
-				}
-			}
-		}
-
-		/* add friction force */
-		totalForce.sum(b.getCurrentFrictionForce());
-
-		return totalForce;
-	}
 	
 	private void testBodySet1_two_bodies() {
 		bounds = new Boundary(-4.0, -4.0, 4.0, 4.0);

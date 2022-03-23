@@ -4,27 +4,28 @@ import pcd.ass01.model.Body;
 import pcd.ass01.model.Boundary;
 import pcd.ass01.model.V2d;
 import pcd.ass01.parallel.monitor.Barrier;
+import pcd.ass01.parallel.monitor.latch.Latch;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CyclicBarrier;
 
 public class Worker extends Thread {
 
-	private Barrier barrier;
-	private List<Body> bodies;
-	private Boundary bounds;
-	private double vt;
-	private double dt;
-	private int nSteps;
-	private Iterable<Body> myBodies;
+	private final SimulationData data;
+	private final Iterable<Body> myBodies;
+	private final CyclicBarrier barrier;
+	private final Latch latch;
 
-	
-	public Worker(String name, Barrier barrier) {
+	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier barrier, Latch latch) {
 		super(name);
+		this.data = data;
+		this.myBodies = myBodies;
 		this.barrier = barrier;
+		this.latch = latch;
 	}
-	
+
 	public void run() {
 		/* init virtual time */
 
