@@ -21,7 +21,7 @@ import java.util.Collection;
  *
  */
 public class SimulationView implements SimulationDisplay {
-        
+
 	private VisualiserFrame frame;
 	
     /**
@@ -38,9 +38,18 @@ public class SimulationView implements SimulationDisplay {
  	   frame.display(bodies, vt, iter, bounds); 
     }
 
+	public void addListener(InputListener l){
+		frame.addListener(l);
+	}
+
+	public void removeListener(InputListener l){
+		frame.removeListener(l);
+	}
+
     public static class VisualiserFrame extends JFrame implements KeyListener {
 
         private VisualiserPanel panel;
+		private final ArrayList<InputListener> listeners = new ArrayList<>();
 
         public VisualiserFrame(int w, int h){
             setTitle("Bodies Simulation");
@@ -53,8 +62,21 @@ public class SimulationView implements SimulationDisplay {
 
 			JPanel buttonsPanel = new JPanel();
 			buttonsPanel.setLayout(new FlowLayout());
-			buttonsPanel.add(new JButton("Play"));
-			buttonsPanel.add(new JButton("Pause"));
+
+			JButton playButton = new JButton("Play");
+			playButton.addActionListener((action) -> {
+				for (InputListener listener : listeners) {
+					listener.onResumePressed();
+				}
+			});
+			buttonsPanel.add(playButton);
+			JButton pauseButton = new JButton("Pause");
+			pauseButton.addActionListener((action) -> {
+				for (InputListener listener : listeners) {
+					listener.onPausePressed();
+				}
+			});
+			buttonsPanel.add(pauseButton);
 
 			GridBagConstraints panelCons = new GridBagConstraints();
 			panelCons.fill = GridBagConstraints.BOTH;
@@ -88,11 +110,19 @@ public class SimulationView implements SimulationDisplay {
 	            	repaint();
 	        	});
         	} catch (Exception ex) {}
-        };
+        }
         
         public void updateScale(double k) {
         	panel.updateScale(k);
         }
+
+		public void addListener(InputListener l){
+			listeners.add(l);
+		}
+
+		public void removeListener(InputListener l){
+			listeners.remove(l);
+		}
 
 		@Override
 		public void keyPressed(KeyEvent e) {
