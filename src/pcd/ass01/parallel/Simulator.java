@@ -15,8 +15,7 @@ public class Simulator {
 	private SimulationDisplay viewer;
 	private SimulationData simulationData;
 	private boolean isRunning = false;
-	IterationTracker iterationTracker = new IterationTracker();
-	Latch latch;
+	private IterationTracker iterationTracker = new IterationTracker();
 
 	public Simulator(SimulationDisplay viewer, SimulationData simulationData) {
 		this.viewer = viewer;
@@ -25,14 +24,13 @@ public class Simulator {
 	
 	public void configure() {
 		int nWorkers = Runtime.getRuntime().availableProcessors();
-
 		int partitionSize = nWorkers > simulationData.getBodies().size() ? 1: (int) Math.ceil(simulationData.getBodies().size()/(double) nWorkers);
 
 		Partitions<Body> partitions = Partitions.ofSize(simulationData.getBodies(), partitionSize);
 		List<Worker> workers = new ArrayList<>();
 
 		CyclicBarrier endForceComputationBarrier = new RealCyclicBarrier(partitions.size() + 1);
-		latch = new RealLatch(partitions.size());
+		Latch latch = new RealLatch(partitions.size());
 
 		/* display current stage */
 		viewer.display(
@@ -46,9 +44,20 @@ public class Simulator {
 			workers.add(worker);
 			worker.start();
 		}
+		simulationLoop(endForceComputationBarrier,latch);
+	}
 
-		/* simulation loop */
+	public synchronized void playSimulation() {
+		if (isRunning) return;
+		isRunning = true;
+		iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
+	}
+	public synchronized void pauseSimulation() {
+		if (!isRunning) return;
+		isRunning = false;
+	}
 
+	private void simulationLoop(CyclicBarrier endForceComputationBarrier, Latch latch) {
 		while (!simulationData.isOver()) {
 			try {
 				if(isRunning) {
@@ -75,15 +84,6 @@ public class Simulator {
 				e.printStackTrace();
 			}
 		}
-	}
-	public synchronized void playSimulation() {
-		if (isRunning) return;
-		isRunning = true;
-		iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
-	}
-	public synchronized void pauseSimulation() {
-		if (!isRunning) return;
-		isRunning = false;
 	}
 
 }
