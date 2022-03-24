@@ -14,10 +14,11 @@ public class ParallelBodySimulationMain {
 
     public static void main(String[] args) {
         SimulationView viewer = new SimulationView(620, 620);
-        Simulator sim = new Simulator(viewer);
+        SimulationDataFactory dataFactory=new SimulationDataFactory();
+        Simulator sim = new Simulator(viewer,dataFactory.testBodySet4_many_bodies(5000));
         Controller controller = new Controller(sim);
         viewer.addListener(controller);
-        sim.configure(5000);
+        sim.configure();
     }
 
     private static void testSpeedMain() {
@@ -27,8 +28,8 @@ public class ParallelBodySimulationMain {
         for (int i = 0; i < nExecution; i++) {
             long start = System.nanoTime();
 
-            Simulator sim = new Simulator(new ConsoleSimulationDisplay());
-            sim.configure(2000);
+            //Simulator sim = new Simulator(new ConsoleSimulationDisplay());
+            //sim.configure(2000);
 
             long end = System.nanoTime();
             long elapsedTime = end - start;
