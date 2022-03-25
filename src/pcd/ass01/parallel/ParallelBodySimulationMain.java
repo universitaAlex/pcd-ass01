@@ -28,8 +28,10 @@ public class ParallelBodySimulationMain {
         for (int i = 0; i < nExecution; i++) {
             long start = System.nanoTime();
 
-            //Simulator sim = new Simulator(new ConsoleSimulationDisplay());
-            //sim.configure(2000);
+            SimulationDataFactory dataFactory = new SimulationDataFactory();
+            Simulator sim = new Simulator(new ConsoleSimulationDisplay(), dataFactory.testBodySet4_many_bodies(5000));
+            sim.playSimulation();
+            sim.configure();
 
             long end = System.nanoTime();
             long elapsedTime = end - start;
