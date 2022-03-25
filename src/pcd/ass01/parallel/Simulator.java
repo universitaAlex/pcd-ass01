@@ -55,7 +55,6 @@ public class Simulator {
 					iterationTracker.waitIteration(simulationData.getCurrentIteration());
 				}
 				endForceComputationBarrier.hitAndWaitAll();
-				endForceComputationBarrier.reset();
 				latch.await();
 				latch.resetCount();
 
