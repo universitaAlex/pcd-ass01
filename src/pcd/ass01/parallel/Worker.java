@@ -3,15 +3,12 @@ package pcd.ass01.parallel;
 import pcd.ass01.model.Body;
 import pcd.ass01.model.V2d;
 import pcd.ass01.parallel.monitor.*;
-import pcd.ass01.parallel.monitor.latch.Latch;
-
-import java.util.concurrent.BrokenBarrierException;
 
 public class Worker extends Thread {
 
 	private final SimulationData data;
-	private TaskBag taskBag;
-	private TaskCompletionLatch taskCompletionLatch;
+	private final TaskBag taskBag;
+	private final TaskCompletionLatch taskCompletionLatch;
 
 	public Worker(SimulationData data, TaskBag taskBag, TaskCompletionLatch taskCompletionLatch) {
 		super();
@@ -22,7 +19,10 @@ public class Worker extends Thread {
 
 	public void run() {
 		/* simulation loop */
+		int i = 0;
 		while (true) {
+			System.out.println("Task taken: " + i);
+			i++;
 			Task task = taskBag.getATask();
 			Body b = task.getBody();
 			switch (task.getTaskType()) {

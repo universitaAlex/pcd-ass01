@@ -14,6 +14,17 @@ public class Flag {
 	
 	public synchronized void set() {
 		flag = true;
+		notifyAll();
+	}
+
+	public synchronized void waitSet() {
+		while (!flag) {
+			try {
+				wait();
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 	
 	public synchronized boolean isSet() {

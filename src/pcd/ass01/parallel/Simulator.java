@@ -2,18 +2,12 @@ package pcd.ass01.parallel;
 
 import pcd.ass01.model.*;
 import pcd.ass01.parallel.monitor.*;
-import pcd.ass01.parallel.monitor.latch.Latch;
-import pcd.ass01.parallel.monitor.latch.RealLatch;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Simulator {
 
 	private final SimulationDisplay viewer;
 	private final SimulationData simulationData;
-	private boolean isRunning = false;
-	private final IterationTracker iterationTracker = new IterationTracker();
+	private final Flag runningFlag = new Flag();
 
 	public Simulator(SimulationDisplay viewer, SimulationData simulationData) {
 		this.viewer = viewer;
@@ -43,11 +37,7 @@ public class Simulator {
 	private void simulationLoop(TaskBag taskBag, TaskCompletionLatch taskCompletionLatch) {
 		while (!simulationData.isOver()) {
 			try {
-				if(isRunning) {
-					iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
-				} else {
-					iterationTracker.waitIteration(simulationData.getCurrentIteration());
-				}
+				runningFlag.waitSet();
 				for (Body body: simulationData.getBodies()) {
 					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_FORCES, body));
 				}
@@ -70,17 +60,17 @@ public class Simulator {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			break;
 		}
 	}
 
 	public synchronized void playSimulation() {
-		if (isRunning) return;
-		isRunning = true;
-		iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
+		if (runningFlag.isSet()) return;
+		runningFlag.set();
 	}
 	public synchronized void pauseSimulation() {
-		if (!isRunning) return;
-		isRunning = false;
+		if (runningFlag.isSet()) return;
+		runningFlag.reset();
 	}
 
 }
