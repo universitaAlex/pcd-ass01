@@ -40,6 +40,4 @@ public class RealCyclicBarrier implements CyclicBarrier {
 		}
 		notify();
 	}
-	public synchronized void reset() {
-	}
 }

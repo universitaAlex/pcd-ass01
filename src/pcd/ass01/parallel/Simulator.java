@@ -12,14 +12,14 @@ import java.util.List;
 
 public class Simulator {
 
-	private SimulationDisplay viewer;
-	private SimulationData simulationData;
+	private final SimulationDisplay viewer;
+	private final SimulationData simulationData;
 	private boolean isRunning = false;
-	private IterationTracker iterationTracker = new IterationTracker();
+	private final IterationTracker iterationTracker = new IterationTracker();
 
 	public Simulator(SimulationDisplay viewer, SimulationData simulationData) {
 		this.viewer = viewer;
-		this.simulationData=simulationData;
+		this.simulationData = simulationData;
 	}
 	
 	public void configure() {
@@ -27,12 +27,12 @@ public class Simulator {
 		int partitionSize = nWorkers > simulationData.getBodies().size() ? 1: (int) Math.ceil(simulationData.getBodies().size()/(double) nWorkers);
 
 		Partitions<Body> partitions = Partitions.ofSize(simulationData.getBodies(), partitionSize);
-		List<Worker> workers = new ArrayList<>();
 
+		System.out.println("Number of partitions " + partitions.size());
 		CyclicBarrier endForceComputationBarrier = new RealCyclicBarrier(partitions.size() + 1);
 		Latch latch = new RealLatch(partitions.size());
 
-		/* display current stage */
+		/* display initial stage */
 		viewer.display(
 				simulationData.getBodies(),
 				simulationData.getVt(),
@@ -41,20 +41,9 @@ public class Simulator {
 		);
 		for (List<Body> partition : partitions) {
 			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
-			workers.add(worker);
 			worker.start();
 		}
 		simulationLoop(endForceComputationBarrier,latch);
-	}
-
-	public synchronized void playSimulation() {
-		if (isRunning) return;
-		isRunning = true;
-		iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
-	}
-	public synchronized void pauseSimulation() {
-		if (!isRunning) return;
-		isRunning = false;
 	}
 
 	private void simulationLoop(CyclicBarrier endForceComputationBarrier, Latch latch) {
@@ -84,6 +73,16 @@ public class Simulator {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public synchronized void playSimulation() {
+		if (isRunning) return;
+		isRunning = true;
+		iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
+	}
+	public synchronized void pauseSimulation() {
+		if (!isRunning) return;
+		isRunning = false;
 	}
 
 }
