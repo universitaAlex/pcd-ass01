@@ -6,7 +6,7 @@ import pcd.ass01.model.Boundary;
 import java.util.List;
 
 public class SimulationData {
-    private final List<Body> bodies;
+    private List<Body> bodies;
     private final Boundary bounds;
     private double vt = 0;
     private final double dt;
@@ -23,6 +23,11 @@ public class SimulationData {
     public List<Body> getBodies() {
         return bodies;
     }
+
+    public void setBodies(List<Body> bodies) {
+        this.bodies = bodies;
+    }
+
 
     public Boundary getBounds() {
         return bounds;

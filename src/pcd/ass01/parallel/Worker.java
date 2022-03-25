@@ -21,21 +21,18 @@ public class Worker extends Thread {
 		/* simulation loop */
 		while (true) {
 			Task task = taskBag.getATask();
-			Body b = task.getBody();
-			switch (task.getTaskType()) {
-				case COMPUTE_VELOCITY -> {
-					/* compute total force on bodies */
-					V2d totalForce = computeTotalForceOnBody(b);
-					/* compute instant acceleration */
-					V2d acc = new V2d(totalForce).scalarMul(1.0 / b.getMass());
-					/* update velocity */
-					b.updateVelocity(acc, data.getDt());
-				}
-				case COMPUTE_POSITION -> {
-					b.updatePos(data.getDt());
-					b.checkAndSolveBoundaryCollision(data.getBounds());
-				}
-			}
+			Body b = new Body(task.getBody());
+
+			/* compute total force on bodies */
+			V2d totalForce = computeTotalForceOnBody(b);
+			/* compute instant acceleration */
+			V2d acc = new V2d(totalForce).scalarMul(1.0 / b.getMass());
+			/* update velocity */
+			b.updateVelocity(acc, data.getDt());
+			b.updatePos(data.getDt());
+			b.checkAndSolveBoundaryCollision(data.getBounds());
+
+			taskBag.addNewResult(b);
 			taskCompletionLatch.notifyCompletion();
 		}
 	}

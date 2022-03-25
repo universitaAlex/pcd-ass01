@@ -21,6 +21,12 @@ public class Body {
         this.vel = vel;
         this.mass = mass;
     }
+    public Body(Body body){
+        this.id = body.id;
+        this.pos = body.pos;
+        this.vel = body.vel;
+        this.mass = body.mass;
+    }
     
     public double getMass() {
     	return mass;

@@ -3,6 +3,8 @@ package pcd.ass01.parallel;
 import pcd.ass01.model.*;
 import pcd.ass01.parallel.monitor.*;
 
+import java.util.List;
+
 public class Simulator {
 
 	private final SimulationDisplay viewer;
@@ -18,7 +20,7 @@ public class Simulator {
 		int nWorkers = Runtime.getRuntime().availableProcessors();
 
 		TaskBag bag = new TaskBag();
-		TaskCompletionLatch taskLatch = new TaskCompletionLatch(nWorkers);
+		TaskCompletionLatch taskLatch = new TaskCompletionLatch(simulationData.getBodies().size());
 
 		/* display initial stage */
 		viewer.display(
@@ -37,24 +39,24 @@ public class Simulator {
 	private void simulationLoop(TaskBag taskBag, TaskCompletionLatch taskCompletionLatch) {
 		while (!simulationData.isOver()) {
 			try {
+				taskBag.clear();
 				runningFlag.waitSet();
+
 				for (Body body: simulationData.getBodies()) {
-					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_VELOCITY, body));
+					taskBag.addNewTask(new Task(body));
 				}
 				taskCompletionLatch.waitCompletion();
 				taskCompletionLatch.reset();
 
-				for (Body body: simulationData.getBodies()) {
-					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_POSITION, body));
-				}
-				taskCompletionLatch.waitCompletion();
-				taskCompletionLatch.reset();
+				List<Body> results = taskBag.getResults();
+
+				simulationData.setBodies(results);
 				/* update virtual time */
 				simulationData.nextIteration();
 
 				/* display current stage */
 				viewer.display(
-						simulationData.getBodies(),
+						results,
 						simulationData.getVt(),
 						simulationData.getCurrentIteration(),
 						simulationData.getBounds()
