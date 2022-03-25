@@ -1,9 +1,7 @@
 package pcd.ass01.parallel;
 
 import pcd.ass01.model.*;
-import pcd.ass01.parallel.monitor.CyclicBarrier;
-import pcd.ass01.parallel.monitor.IterationTracker;
-import pcd.ass01.parallel.monitor.RealCyclicBarrier;
+import pcd.ass01.parallel.monitor.*;
 import pcd.ass01.parallel.monitor.latch.Latch;
 import pcd.ass01.parallel.monitor.latch.RealLatch;
 
@@ -24,13 +22,9 @@ public class Simulator {
 	
 	public void configure() {
 		int nWorkers = Runtime.getRuntime().availableProcessors();
-		int partitionSize = nWorkers > simulationData.getBodies().size() ? 1: (int) Math.ceil(simulationData.getBodies().size()/(double) nWorkers);
 
-		Partitions<Body> partitions = Partitions.ofSize(simulationData.getBodies(), partitionSize);
-
-		System.out.println("Number of partitions " + partitions.size());
-		CyclicBarrier endForceComputationBarrier = new RealCyclicBarrier(partitions.size() + 1);
-		Latch latch = new RealLatch(partitions.size());
+		TaskBag bag = new TaskBag();
+		TaskCompletionLatch taskLatch = new TaskCompletionLatch(nWorkers);
 
 		/* display initial stage */
 		viewer.display(
@@ -39,14 +33,14 @@ public class Simulator {
 				simulationData.getCurrentIteration(),
 				simulationData.getBounds()
 		);
-		for (List<Body> partition : partitions) {
-			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
+		for (int i = 0; i < nWorkers; i++) {
+			Worker worker = new Worker(simulationData, bag, taskLatch);
 			worker.start();
 		}
-		simulationLoop(endForceComputationBarrier,latch);
+		simulationLoop(bag, taskLatch);
 	}
 
-	private void simulationLoop(CyclicBarrier endForceComputationBarrier, Latch latch) {
+	private void simulationLoop(TaskBag taskBag, TaskCompletionLatch taskCompletionLatch) {
 		while (!simulationData.isOver()) {
 			try {
 				if(isRunning) {
@@ -54,10 +48,15 @@ public class Simulator {
 				} else {
 					iterationTracker.waitIteration(simulationData.getCurrentIteration());
 				}
-				endForceComputationBarrier.hitAndWaitAll();
-				latch.await();
-				latch.resetCount();
+				for (Body body: simulationData.getBodies()) {
+					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_FORCES, body));
+				}
+				taskCompletionLatch.waitCompletion();
 
+				for (Body body: simulationData.getBodies()) {
+					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_POSITIONS, body));
+				}
+				taskCompletionLatch.waitCompletion();
 				/* update virtual time */
 				simulationData.nextIteration();
 

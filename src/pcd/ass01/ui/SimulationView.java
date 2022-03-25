@@ -163,7 +163,6 @@ public class SimulationView implements SimulationDisplay {
 
         public void paint(Graphics g){    		    		
     		if (bodies != null) {
-				System.out.println("Re evaluate");
         		Graphics2D g2 = (Graphics2D) g;
         		
         		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

@@ -13,12 +13,13 @@ import java.util.concurrent.TimeUnit;
 public class ParallelBodySimulationMain {
 
     public static void main(String[] args) {
-        SimulationView viewer = new SimulationView(620, 620);
+        /*SimulationView viewer = new SimulationView(620, 620);
         SimulationDataFactory dataFactory = new SimulationDataFactory();
         Simulator sim = new Simulator(viewer,dataFactory.testBodySet4_many_bodies(5000));
         Controller controller = new Controller(sim);
         viewer.addListener(controller);
-        sim.configure();
+        sim.configure();*/
+        testSpeedMain();
     }
 
     private static void testSpeedMain() {
@@ -26,16 +27,21 @@ public class ParallelBodySimulationMain {
         //SimulationView viewer = new SimulationView(620,620);
         double elapsedTimeSum = 0;
         for (int i = 0; i < nExecution; i++) {
+            System.out.println("Started execution " + i );
             long start = System.nanoTime();
 
-            //Simulator sim = new Simulator(new ConsoleSimulationDisplay());
-            //sim.configure(2000);
+            SimulationDataFactory dataFactory = new SimulationDataFactory();
+
+            Simulator sim = new Simulator(new ConsoleSimulationDisplay(), dataFactory.testBodySet4_many_bodies(5000));
+            sim.playSimulation();
+            sim.configure();
 
             long end = System.nanoTime();
             long elapsedTime = end - start;
 
             double elapsedTimeSeconds = TimeUnit.MILLISECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS) / 1000.0;
             elapsedTimeSum+=elapsedTimeSeconds;
+            System.out.println("Completed execution " + i + " seconds = " + elapsedTimeSeconds);
         }
         double elapsedTimeAvg = elapsedTimeSum/nExecution;
         System.out.println("Elapsed time: " + (elapsedTimeAvg) + " s");
