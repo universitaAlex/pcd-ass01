@@ -22,6 +22,6 @@ public class Task {
 
 
 	public enum TaskType {
-		COMPUTE_FORCES, COMPUTE_POSITIONS;
+		COMPUTE_VELOCITY, COMPUTE_POSITION;
 	}
 }

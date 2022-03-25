@@ -39,14 +39,16 @@ public class Simulator {
 			try {
 				runningFlag.waitSet();
 				for (Body body: simulationData.getBodies()) {
-					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_FORCES, body));
+					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_VELOCITY, body));
 				}
 				taskCompletionLatch.waitCompletion();
+				taskCompletionLatch.reset();
 
 				for (Body body: simulationData.getBodies()) {
-					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_POSITIONS, body));
+					taskBag.addNewTask(new Task(Task.TaskType.COMPUTE_POSITION, body));
 				}
 				taskCompletionLatch.waitCompletion();
+				taskCompletionLatch.reset();
 				/* update virtual time */
 				simulationData.nextIteration();
 
@@ -60,7 +62,6 @@ public class Simulator {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			break;
 		}
 	}
 

@@ -4,10 +4,10 @@ import java.util.LinkedList;
 
 public class TaskBag {
 
-	private LinkedList<Task> buffer;
+	private final LinkedList<Task> buffer;
 
 	public TaskBag() {
-		buffer = new LinkedList<Task>();
+		buffer = new LinkedList<>();
 	}
 
 	public synchronized void clear() {
