@@ -54,12 +54,14 @@ public class Simulator {
 				} else {
 					iterationTracker.waitIteration(simulationData.getCurrentIteration());
 				}
-				endForceComputationBarrier.hitAndWaitAll();
 				latch.await();
 				latch.resetCount();
-
+				List<Body> results = iterationTracker.getResults();
+				iterationTracker.clearResults();
 				/* update virtual time */
 				simulationData.nextIteration();
+
+				simulationData.setBodies(results);
 
 				/* display current stage */
 				viewer.display(

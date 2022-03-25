@@ -6,17 +6,19 @@ import pcd.ass01.parallel.monitor.CyclicBarrier;
 import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.latch.Latch;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 
 public class Worker extends Thread {
 
 	private final IterationTracker iterationTracker;
 	private final SimulationData data;
-	private final Iterable<Body> myBodies;
+	private List<Body> myBodies;
 	private final CyclicBarrier endForceComputationBarrier;
 	private final Latch latch;
 
-	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, IterationTracker iterationTracker) {
+	public Worker(String name, SimulationData data, List<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, IterationTracker iterationTracker) {
 		super(name);
 		this.data = data;
 		this.myBodies = myBodies;
@@ -31,24 +33,21 @@ public class Worker extends Thread {
 		while (!data.isOver()) {
 			iterationTracker.waitIteration(iteration);
 			/* update bodies velocity */
-			for (Body b : myBodies) {
+			List<Body> newBodies = new ArrayList<>(myBodies.size());
+			for (Body oldBody : myBodies) {
+				Body b = new Body(oldBody);
 				/* compute total force on bodies */
 				V2d totalForce = computeTotalForceOnBody(b);
 				/* compute instant acceleration */
 				V2d acc = new V2d(totalForce).scalarMul(1.0 / b.getMass());
 				/* update velocity */
 				b.updateVelocity(acc, data.getDt());
-			}
-			try {
-				endForceComputationBarrier.hitAndWaitAll();
-			} catch (BrokenBarrierException e) {
-				e.printStackTrace();
-			}
-			/* compute bodies new pos and check collisions with boundaries */
-			for (Body b : myBodies) {
 				b.updatePos(data.getDt());
 				b.checkAndSolveBoundaryCollision(data.getBounds());
+				newBodies.add(b);
 			}
+			iterationTracker.addResults(newBodies);
+			this.myBodies = newBodies;
 			latch.countDown();
 			iteration++;
 		}
