@@ -157,7 +157,6 @@ public class SimulationView implements SimulationDisplay {
         private long dy;
 
         public VisualiserPanel(int w, int h) {
-            System.out.println("Drawing VisualiserPanel!");
             setSize(w, h);
             dx = w / 2 - 20;
             dy = h / 2 - 20;
