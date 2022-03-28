@@ -2,6 +2,7 @@ package pcd.ass01.parallel;
 
 import pcd.ass01.model.Body;
 import pcd.ass01.model.V2d;
+import pcd.ass01.parallel.model.SimulationData;
 import pcd.ass01.parallel.monitor.CyclicBarrier;
 import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.latch.Latch;

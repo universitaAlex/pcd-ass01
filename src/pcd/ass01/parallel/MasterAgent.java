@@ -2,6 +2,7 @@ package pcd.ass01.parallel;
 
 import pcd.ass01.model.Body;
 import pcd.ass01.model.SimulationDisplay;
+import pcd.ass01.parallel.model.MutableSimulationData;
 import pcd.ass01.parallel.monitor.CyclicBarrier;
 import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.parallel.monitor.IterationTracker;
@@ -15,13 +16,13 @@ public class MasterAgent extends Thread {
 
     private final int nWorkers;
     private final SimulationDisplay viewer;
-    private final SimulationData simulationData;
+    private final MutableSimulationData simulationData;
     private final IterationTracker iterationTracker = new IterationTracker();
     private final Flag isRunningFlag;
 
     public MasterAgent(
             SimulationDisplay viewer,
-            SimulationData simulationData,
+            MutableSimulationData simulationData,
             int nWorkers,
             Flag isRunningFlag
     ) {

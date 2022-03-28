@@ -1,12 +1,11 @@
 package pcd.ass01.parallel.speed_test;
 
-import pcd.ass01.parallel.MasterAgent;
-import pcd.ass01.parallel.SimulationDataFactory;
-import pcd.ass01.parallel.monitor.Flag;
-
 import java.util.concurrent.TimeUnit;
 
 public class SpeedTestUtils {
+
+    private SpeedTestUtils() {}
+
     static public void test(int nExecution, Runnable runnable) {
         double elapsedTimeSum = 0;
         for (int i = 0; i < nExecution; i++) {
