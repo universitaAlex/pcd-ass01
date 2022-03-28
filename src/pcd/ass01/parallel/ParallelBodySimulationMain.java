@@ -6,8 +6,6 @@ import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.parallel.speed_test.SpeedTestUtils;
 import pcd.ass01.ui.SimulationView;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Bodies simulation - legacy code: sequential, unstructured
  *
@@ -16,6 +14,10 @@ import java.util.concurrent.TimeUnit;
 public class ParallelBodySimulationMain {
 
     public static void main(String[] args) {
+        launchWithUI();
+    }
+
+    private static void launchWithUI() {
         int nWorkers = Runtime.getRuntime().availableProcessors();
         Flag runningFlag = new Flag();
         SimulationView viewer = new SimulationView(620, 620);
@@ -24,11 +26,9 @@ public class ParallelBodySimulationMain {
         masterAgent.start();
         Controller controller = new Controller(runningFlag);
         viewer.addListener(controller);
-
-        //testSpeedMain();
     }
 
-    private static void testSpeedMain() {
+    private static void launchSpeedTest() {
         int nWorkers = Runtime.getRuntime().availableProcessors();
         SimulationDataFactory dataFactory = new SimulationDataFactory();
 
