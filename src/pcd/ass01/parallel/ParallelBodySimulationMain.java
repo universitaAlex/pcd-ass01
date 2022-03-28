@@ -7,6 +7,11 @@ import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.parallel.speed_test.SpeedTestUtils;
 import pcd.ass01.ui.SimulationView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Bodies simulation - legacy code: sequential, unstructured
  *
@@ -15,7 +20,7 @@ import pcd.ass01.ui.SimulationView;
 public class ParallelBodySimulationMain {
 
     public static void main(String[] args) {
-        launchWithUI();
+        launchSpeedTest();
     }
 
     private static void launchWithUI() {
@@ -30,22 +35,26 @@ public class ParallelBodySimulationMain {
     }
 
     private static void launchSpeedTest() {
-        int nWorkers = Runtime.getRuntime().availableProcessors();
+        List<Integer> nWorkersList = Stream.iterate(1, i -> i+1)
+                .limit(Runtime.getRuntime().availableProcessors()+1)
+                .toList();
         MutableSimulationDataFactory dataFactory = new MutableSimulationDataFactory();
 
         SimulationDisplay viewer = new ConsoleSimulationDisplay();
-        SpeedTestUtils.test(10, () -> {
+        for (int nWorkers: nWorkersList) {
+            System.out.println("Test with " + nWorkers + " launched");
+            SpeedTestUtils.test(5, () -> {
+                Flag runningFlag = new Flag();
+                MasterAgent masterAgent = new MasterAgent(viewer,dataFactory.testBodySet4_many_bodies(2000, 1000), nWorkers, runningFlag);
+                masterAgent.start();
+                runningFlag.set();
 
-            Flag runningFlag = new Flag();
-            MasterAgent masterAgent = new MasterAgent(viewer,dataFactory.testBodySet4_many_bodies(5000, 1000), nWorkers, runningFlag);
-            masterAgent.start();
-            runningFlag.set();
-
-            try {
-                masterAgent.join();
-            } catch (InterruptedException e) {
-                System.out.println("Master agent interrupted");
-            }
-        });
+                try {
+                    masterAgent.join();
+                } catch (InterruptedException e) {
+                    System.out.println("Master agent interrupted");
+                }
+            });
+        }
     }
 }
