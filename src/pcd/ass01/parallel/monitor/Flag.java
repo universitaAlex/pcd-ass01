@@ -11,9 +11,17 @@ public class Flag {
     public synchronized void reset() {
         flag = false;
     }
+    public synchronized void awaitSet() {
+        while (!flag) {
+            try {
+                wait();
+            } catch (InterruptedException e) {}
+        }
+    }
 
     public synchronized void set() {
         flag = true;
+        notifyAll();
     }
 
     public synchronized boolean isSet() {

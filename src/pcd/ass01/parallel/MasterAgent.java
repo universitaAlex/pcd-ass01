@@ -1,7 +1,9 @@
 package pcd.ass01.parallel;
 
-import pcd.ass01.model.*;
+import pcd.ass01.model.Body;
+import pcd.ass01.model.SimulationDisplay;
 import pcd.ass01.parallel.monitor.CyclicBarrier;
+import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.RealCyclicBarrier;
 import pcd.ass01.parallel.monitor.latch.Latch;
@@ -9,20 +11,32 @@ import pcd.ass01.parallel.monitor.latch.RealLatch;
 
 import java.util.List;
 
-public class Simulator {
+public class MasterAgent extends Thread {
 
+    private final int nWorkers;
     private final SimulationDisplay viewer;
     private final SimulationData simulationData;
-    private boolean isRunning = false;
     private final IterationTracker iterationTracker = new IterationTracker();
+    private final Flag isRunningFlag;
 
-    public Simulator(SimulationDisplay viewer, SimulationData simulationData) {
+    public MasterAgent(
+            SimulationDisplay viewer,
+            SimulationData simulationData,
+            int nWorkers,
+            Flag isRunningFlag
+    ) {
         this.viewer = viewer;
         this.simulationData = simulationData;
+        this.nWorkers = nWorkers;
+        this.isRunningFlag = isRunningFlag;
     }
 
-    public void configure() {
-        int nWorkers = Runtime.getRuntime().availableProcessors();
+    @Override
+    public void run() {
+        configure();
+    }
+
+    private void configure() {
         int partitionSize = nWorkers > simulationData.getBodies().size() ? 1 : (int) Math.ceil(simulationData.getBodies().size() / (double) nWorkers);
 
         Partitions<Body> partitions = Partitions.ofSize(simulationData.getBodies(), partitionSize);
@@ -48,11 +62,10 @@ public class Simulator {
     private void simulationLoop(CyclicBarrier endForceComputationBarrier, Latch latch) {
         while (!simulationData.isOver()) {
             try {
-                if (isRunning) {
-                    iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
-                } else {
-                    iterationTracker.waitIteration(simulationData.getCurrentIteration());
-                }
+                isRunningFlag.awaitSet();
+
+                iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
+
                 endForceComputationBarrier.hitAndWaitAll();
                 latch.await();
                 latch.resetCount();
@@ -72,17 +85,6 @@ public class Simulator {
             }
         }
         iterationTracker.terminate();
-    }
-
-    public synchronized void playSimulation() {
-        if (isRunning) return;
-        isRunning = true;
-        iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
-    }
-
-    public synchronized void pauseSimulation() {
-        if (!isRunning) return;
-        isRunning = false;
     }
 
 }

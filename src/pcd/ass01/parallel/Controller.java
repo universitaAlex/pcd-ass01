@@ -1,5 +1,6 @@
 package pcd.ass01.parallel;
 
+import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.ui.InputListener;
 
 /**
@@ -9,19 +10,19 @@ import pcd.ass01.ui.InputListener;
  */
 public class Controller implements InputListener {
 
-    private final Simulator simulator;
+    private final Flag runningFlag;
 
-    public Controller(Simulator simulator) {
-        this.simulator = simulator;
+    public Controller(Flag runningFlag) {
+        this.runningFlag = runningFlag;
     }
 
     @Override
     public void onResumePressed() {
-        new Thread(simulator::playSimulation).start();
+        runningFlag.set();
     }
 
     @Override
     public void onPausePressed() {
-        new Thread(simulator::pauseSimulation).start();
+        runningFlag.reset();
     }
 }

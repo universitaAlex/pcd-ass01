@@ -1,6 +1,9 @@
 package pcd.ass01.parallel;
 
 import pcd.ass01.model.ConsoleSimulationDisplay;
+import pcd.ass01.model.SimulationDisplay;
+import pcd.ass01.parallel.monitor.Flag;
+import pcd.ass01.parallel.speed_test.SpeedTestUtils;
 import pcd.ass01.ui.SimulationView;
 
 import java.util.concurrent.TimeUnit;
@@ -13,34 +16,35 @@ import java.util.concurrent.TimeUnit;
 public class ParallelBodySimulationMain {
 
     public static void main(String[] args) {
-        /*SimulationView viewer = new SimulationView(620, 620);
+        int nWorkers = Runtime.getRuntime().availableProcessors();
+        Flag runningFlag = new Flag();
+        SimulationView viewer = new SimulationView(620, 620);
         SimulationDataFactory dataFactory = new SimulationDataFactory();
-        Simulator sim = new Simulator(viewer,dataFactory.testBodySet4_many_bodies(5000));
-        Controller controller = new Controller(sim);
+        MasterAgent masterAgent = new MasterAgent(viewer,dataFactory.testBodySet4_many_bodies(5000), nWorkers, runningFlag);
+        masterAgent.start();
+        Controller controller = new Controller(runningFlag);
         viewer.addListener(controller);
-        sim.configure();*/
-        testSpeedMain();
+
+        //testSpeedMain();
     }
 
     private static void testSpeedMain() {
-        int nExecution = 10;
-        //SimulationView viewer = new SimulationView(620,620);
-        double elapsedTimeSum = 0;
-        for (int i = 0; i < nExecution; i++) {
-            long start = System.nanoTime();
+        int nWorkers = Runtime.getRuntime().availableProcessors();
+        SimulationDataFactory dataFactory = new SimulationDataFactory();
 
-            SimulationDataFactory dataFactory = new SimulationDataFactory();
-            Simulator sim = new Simulator(new ConsoleSimulationDisplay(), dataFactory.testBodySet4_many_bodies(5000));
-            sim.playSimulation();
-            sim.configure();
+        SimulationDisplay viewer = new ConsoleSimulationDisplay();
+        SpeedTestUtils.test(10, () -> {
 
-            long end = System.nanoTime();
-            long elapsedTime = end - start;
+            Flag runningFlag = new Flag();
+            MasterAgent masterAgent = new MasterAgent(viewer,dataFactory.testBodySet4_many_bodies(5000), nWorkers, runningFlag);
+            masterAgent.start();
+            runningFlag.set();
 
-            double elapsedTimeSeconds = TimeUnit.MILLISECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS) / 1000.0;
-            elapsedTimeSum += elapsedTimeSeconds;
-        }
-        double elapsedTimeAvg = elapsedTimeSum / nExecution;
-        System.out.println("Elapsed time: " + (elapsedTimeAvg) + " s");
+            try {
+                masterAgent.join();
+            } catch (InterruptedException e) {
+                System.out.println("Master agent interrupted");
+            }
+        });
     }
 }
