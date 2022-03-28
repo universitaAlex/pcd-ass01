@@ -8,7 +8,7 @@ import pcd.ass01.parallel.monitor.latch.Latch;
 
 import java.util.concurrent.BrokenBarrierException;
 
-public class Worker extends Thread {
+public class WorkerAgent extends Thread {
 
     private final IterationTracker iterationTracker;
     private final SimulationData data;
@@ -16,7 +16,7 @@ public class Worker extends Thread {
     private final CyclicBarrier endForceComputationBarrier;
     private final Latch latch;
 
-    public Worker(SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, IterationTracker iterationTracker) {
+    public WorkerAgent(SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, IterationTracker iterationTracker) {
         super();
         this.data = data;
         this.myBodies = myBodies;

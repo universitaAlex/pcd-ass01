@@ -53,7 +53,7 @@ public class MasterAgent extends Thread {
                 simulationData.getBounds()
         );
         for (List<Body> partition : partitions) {
-            Worker worker = new Worker(simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
+            WorkerAgent worker = new WorkerAgent(simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
             worker.start();
         }
         simulationLoop(endForceComputationBarrier, latch);
