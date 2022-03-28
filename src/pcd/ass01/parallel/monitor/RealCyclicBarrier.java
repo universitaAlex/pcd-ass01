@@ -2,12 +2,9 @@ package pcd.ass01.parallel.monitor;
 
 import java.util.concurrent.BrokenBarrierException;
 
-/*
- * Barrier - to be implemented
- */
 public class RealCyclicBarrier implements CyclicBarrier {
 
-	private int nParticipants;
+	private final int nParticipants;
 	private int nHits;
 	private int nOut;
 	private boolean broken;

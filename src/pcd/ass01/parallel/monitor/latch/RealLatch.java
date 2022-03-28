@@ -1,11 +1,8 @@
 package pcd.ass01.parallel.monitor.latch;
 
-/*
- * Latch - to be implemented
- */
 public class RealLatch implements Latch {
 
-    private int count;
+    private final int count;
     private int currentCount;
     public RealLatch(int count) {
         this.count = count;

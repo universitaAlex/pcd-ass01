@@ -38,7 +38,7 @@ public class Simulator {
 				simulationData.getBounds()
 		);
 		for (List<Body> partition : partitions) {
-			Worker worker = new Worker("Worker", simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
+			Worker worker = new Worker(simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
 			worker.start();
 		}
 		simulationLoop(endForceComputationBarrier,latch);

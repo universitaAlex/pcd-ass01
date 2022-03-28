@@ -70,14 +70,4 @@ public class Worker extends Thread {
 		totalForce.sum(b.getCurrentFrictionForce());
 		return totalForce;
 	}
-	
-	private void log(String msg) {
-		synchronized(System.out) {
-			System.out.println("[ "+getName()+" ] "+msg);
-		}
-	}
-	
-	private void waitFor(long ms) throws InterruptedException{
-		Thread.sleep(ms);
-	}
 }

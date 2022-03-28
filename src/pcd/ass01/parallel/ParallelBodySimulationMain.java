@@ -13,12 +13,13 @@ import java.util.concurrent.TimeUnit;
 public class ParallelBodySimulationMain {
 
     public static void main(String[] args) {
-        SimulationView viewer = new SimulationView(620, 620);
+        /*SimulationView viewer = new SimulationView(620, 620);
         SimulationDataFactory dataFactory = new SimulationDataFactory();
         Simulator sim = new Simulator(viewer,dataFactory.testBodySet4_many_bodies(5000));
         Controller controller = new Controller(sim);
         viewer.addListener(controller);
-        sim.configure();
+        sim.configure();*/
+        testSpeedMain();
     }
 
     private static void testSpeedMain() {
