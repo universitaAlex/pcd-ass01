@@ -1,7 +1,5 @@
 package pcd.ass01.model;
 
-import pcd.ass01.parallel.SimulationData;
-
 import java.util.Collection;
 
 public interface SimulationDisplay {

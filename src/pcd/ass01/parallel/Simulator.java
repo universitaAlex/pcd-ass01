@@ -6,8 +6,6 @@ import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.RealCyclicBarrier;
 import pcd.ass01.parallel.monitor.latch.Latch;
 import pcd.ass01.parallel.monitor.latch.RealLatch;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class Simulator {

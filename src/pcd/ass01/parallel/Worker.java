@@ -5,7 +5,6 @@ import pcd.ass01.model.V2d;
 import pcd.ass01.parallel.monitor.CyclicBarrier;
 import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.latch.Latch;
-
 import java.util.concurrent.BrokenBarrierException;
 
 public class Worker extends Thread {
@@ -16,8 +15,8 @@ public class Worker extends Thread {
 	private final CyclicBarrier endForceComputationBarrier;
 	private final Latch latch;
 
-	public Worker(String name, SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, IterationTracker iterationTracker) {
-		super(name);
+	public Worker(SimulationData data, Iterable<Body> myBodies, CyclicBarrier endForceComputationBarrier, Latch latch, IterationTracker iterationTracker) {
+		super();
 		this.data = data;
 		this.myBodies = myBodies;
 		this.endForceComputationBarrier = endForceComputationBarrier;
