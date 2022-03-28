@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Bodies simulation - legacy code: sequential, unstructured
- * 
+ *
  * @author aricci
  */
 public class ParallelBodySimulationMain {
@@ -38,9 +38,9 @@ public class ParallelBodySimulationMain {
             long elapsedTime = end - start;
 
             double elapsedTimeSeconds = TimeUnit.MILLISECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS) / 1000.0;
-            elapsedTimeSum+=elapsedTimeSeconds;
+            elapsedTimeSum += elapsedTimeSeconds;
         }
-        double elapsedTimeAvg = elapsedTimeSum/nExecution;
+        double elapsedTimeAvg = elapsedTimeSum / nExecution;
         System.out.println("Elapsed time: " + (elapsedTimeAvg) + " s");
     }
 }

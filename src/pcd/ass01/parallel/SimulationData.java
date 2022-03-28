@@ -45,7 +45,7 @@ public class SimulationData {
     }
 
     public void nextIteration() {
-        if(!isOver()){
+        if (!isOver()) {
             this.vt += this.dt;
             this.iterationsCount++;
         } else {

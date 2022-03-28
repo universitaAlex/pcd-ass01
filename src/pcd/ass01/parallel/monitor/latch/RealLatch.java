@@ -4,6 +4,7 @@ public class RealLatch implements Latch {
 
     private final int count;
     private int currentCount;
+
     public RealLatch(int count) {
         this.count = count;
         this.currentCount = 0;
