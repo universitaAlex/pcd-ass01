@@ -71,6 +71,7 @@ public class Simulator {
                 e.printStackTrace();
             }
         }
+        iterationTracker.terminate();
     }
 
     public synchronized void playSimulation() {

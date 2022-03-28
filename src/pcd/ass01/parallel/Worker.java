@@ -28,8 +28,12 @@ public class Worker extends Thread {
     public void run() {
         /* simulation loop */
         int iteration = 0;
-        while (!data.isOver()) {
-            iterationTracker.waitIteration(iteration);
+        while (true) {
+            boolean shouldContinue = iterationTracker.waitIteration(iteration);
+            if (!shouldContinue) {
+                break;
+            }
+
             /* update bodies velocity */
             for (Body b : myBodies) {
                 /* compute total force on bodies */
