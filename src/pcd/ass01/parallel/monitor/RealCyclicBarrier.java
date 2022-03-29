@@ -36,6 +36,6 @@ public class RealCyclicBarrier implements CyclicBarrier {
             this.nOut = 0;
             this.nHits = 0;
         }
-        notify();
+        notifyAll();
     }
 }

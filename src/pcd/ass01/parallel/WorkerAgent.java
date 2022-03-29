@@ -57,6 +57,7 @@ public class WorkerAgent extends Thread {
             latch.countDown();
             iteration++;
         }
+
     }
 
     private V2d computeTotalForceOnBody(Body b) {

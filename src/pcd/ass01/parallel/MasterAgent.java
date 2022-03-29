@@ -1,5 +1,6 @@
 package pcd.ass01.parallel;
 
+import gov.nasa.jpf.vm.Verify;
 import pcd.ass01.model.Body;
 import pcd.ass01.model.SimulationDisplay;
 import pcd.ass01.parallel.model.MutableSimulationData;
@@ -38,6 +39,7 @@ public class MasterAgent extends Thread {
     }
 
     private void configure() {
+        Verify.beginAtomic();
         int partitionSize = nWorkers > simulationData.getBodies().size() ? 1 : (int) Math.ceil(simulationData.getBodies().size() / (double) nWorkers);
 
         Partitions<Body> partitions = Partitions.ofSize(simulationData.getBodies(), partitionSize);
@@ -57,6 +59,7 @@ public class MasterAgent extends Thread {
             WorkerAgent worker = new WorkerAgent(simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
             worker.start();
         }
+        Verify.endAtomic();
         simulationLoop(endForceComputationBarrier, latch);
     }
 

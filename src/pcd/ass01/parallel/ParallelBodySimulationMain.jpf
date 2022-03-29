@@ -1,0 +1,7 @@
+target = pcd.ass01.parallel.ParallelBodySimulationMain
+
+classpath = out/production/Assignement01
+
+listener=gov.nasa.jpf.listener.PreciseRaceDetector
+
+report.console.property_violation=error,trace
