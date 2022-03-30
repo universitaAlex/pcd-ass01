@@ -34,7 +34,7 @@ public class ParallelBodySimulationMain {
     }
     private static void launchJPFTest() {
         Verify.beginAtomic();
-        MutableSimulationDataFactory dataFactory = new MutableSimulationDataFactory();
+        SimulationDataFactory dataFactory = new SimulationDataFactory();
         int nWorkers = 2;
         SimulationDisplay viewer = new ConsoleSimulationDisplay();
 
