@@ -123,20 +123,20 @@ public class Body {
         double x = pos.getX();
         double y = pos.getY();
 
-        if (x > bounds.getX1()) {
+        if (x > bounds.getX1()){
             pos.setX(bounds.getX1());
             vel.setX(-vel.getX());
-        } else if (x < bounds.getX0()) {
+        } else if (x < bounds.getX0()){
             pos.setX(bounds.getX0());
             vel.setX(-vel.getX());
         }
 
-        if (y > bounds.getY1()) {
+        if (y > bounds.getY1()){
             pos.setY(bounds.getY1());
             vel.setY(-vel.getY());
-        } else if (y < bounds.getY0()) {
+        } else if (y < bounds.getY0()){
             pos.setY(bounds.getY0());
-            pos.setY(-vel.getY());
+            vel.setY(-vel.getY());
         }
     }
 
