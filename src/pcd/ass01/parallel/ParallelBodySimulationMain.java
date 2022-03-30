@@ -3,7 +3,8 @@ package pcd.ass01.parallel;
 import gov.nasa.jpf.vm.Verify;
 import pcd.ass01.model.ConsoleSimulationDisplay;
 import pcd.ass01.model.SimulationDisplay;
-import pcd.ass01.parallel.model.MutableSimulationDataFactory;
+import pcd.ass01.parallel.model.SimulationData;
+import pcd.ass01.parallel.model.SimulationDataFactory;
 import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.parallel.speed_test.SpeedTestUtils;
 import pcd.ass01.ui.SimulationView;
@@ -25,7 +26,7 @@ public class ParallelBodySimulationMain {
         int nWorkers = Runtime.getRuntime().availableProcessors();
         Flag runningFlag = new Flag();
         SimulationView viewer = new SimulationView(620, 620);
-        MutableSimulationDataFactory dataFactory = new MutableSimulationDataFactory();
+        SimulationDataFactory dataFactory = new SimulationDataFactory();
         MasterAgent masterAgent = new MasterAgent(viewer,dataFactory.testBodySet4_many_bodies(5000, 1000), nWorkers, runningFlag);
         masterAgent.start();
         Controller controller = new Controller(runningFlag);

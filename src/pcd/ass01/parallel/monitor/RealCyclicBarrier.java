@@ -18,6 +18,7 @@ public class RealCyclicBarrier implements CyclicBarrier {
 
     @Override
     public synchronized void hitAndWaitAll() throws BrokenBarrierException {
+        if (nParticipants == 1) return; // A barrier with one participant is pass-trough
         if (this.broken) {
             throw new BrokenBarrierException();
         }
@@ -31,11 +32,11 @@ public class RealCyclicBarrier implements CyclicBarrier {
         nOut++;
         if (nOut == 1) {
             this.broken = true;
+            notifyAll();
         } else if (nOut == nHits) {
             this.broken = false;
             this.nOut = 0;
             this.nHits = 0;
         }
-        notifyAll();
     }
 }

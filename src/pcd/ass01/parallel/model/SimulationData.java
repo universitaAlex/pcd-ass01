@@ -10,13 +10,11 @@ public interface SimulationData {
 
     Boundary getBounds();
 
-    double getVt();
+    double getVt(long iteration);
 
     double getDt();
 
     long getMaxIterationsCount();
 
-    long getCurrentIteration();
-
-    boolean isOver();
+    boolean isOver(int currentIteration);
 }
