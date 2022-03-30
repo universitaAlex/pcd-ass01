@@ -1,6 +1,7 @@
 package pcd.ass01.parallel;
 
 import pcd.ass01.model.ConsoleSimulationDisplay;
+import pcd.ass01.model.NoOpSimulationDisplay;
 import pcd.ass01.model.SimulationDisplay;
 import pcd.ass01.parallel.model.SimulationData;
 import pcd.ass01.parallel.model.SimulationDataFactory;
@@ -16,21 +17,28 @@ import java.util.stream.Stream;
  *
  * @author aricci
  */
-public class ParallelBodySimulationMain {
+public class ConsoleBodySimulationMain {
 
     public static void main(String[] args) {
-        launchSpeedTest();
+        launchSimple();
     }
 
-    private static void launchWithUI() {
+    private static void launchSimple() {
         int nWorkers = Runtime.getRuntime().availableProcessors();
-        Flag runningFlag = new Flag();
-        SimulationView viewer = new SimulationView(620, 620);
+
         SimulationDataFactory dataFactory = new SimulationDataFactory();
-        MasterAgent masterAgent = new MasterAgent(viewer,dataFactory.testBodySet4_many_bodies(5000, 1000), nWorkers, runningFlag);
+        SimulationData simulationData = dataFactory.testBodySet4_many_bodies(2000, 1000);
+
+        Flag runningFlag = new Flag();
+        MasterAgent masterAgent = new MasterAgent(new NoOpSimulationDisplay(), simulationData, nWorkers, runningFlag);
         masterAgent.start();
-        Controller controller = new Controller(runningFlag);
-        viewer.addListener(controller);
+        runningFlag.set();
+
+        try {
+            masterAgent.join();
+        } catch (InterruptedException e) {
+            System.out.println("Master agent interrupted");
+        }
     }
 
     private static void launchSpeedTest() {
