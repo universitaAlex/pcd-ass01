@@ -9,6 +9,7 @@ import pcd.ass01.ui.SimulationView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,9 +36,7 @@ public class ParallelBodySimulationMain {
     }
 
     private static void launchSpeedTest() {
-        List<Integer> nWorkersList = Stream.iterate(1, i -> i+1)
-                .limit(Runtime.getRuntime().availableProcessors()+1)
-                .toList();
+        List<Integer> nWorkersList = List.of(8);
         MutableSimulationDataFactory dataFactory = new MutableSimulationDataFactory();
 
         SimulationDisplay viewer = new ConsoleSimulationDisplay();

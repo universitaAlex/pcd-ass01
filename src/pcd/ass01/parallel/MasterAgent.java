@@ -43,7 +43,7 @@ public class MasterAgent extends Thread {
         Partitions<Body> partitions = Partitions.ofSize(simulationData.getBodies(), partitionSize);
 
         System.out.println("Number of partitions " + partitions.size());
-        CyclicBarrier endForceComputationBarrier = new RealCyclicBarrier(partitions.size() + 1);
+        CyclicBarrier endForceComputationBarrier = new RealCyclicBarrier(partitions.size());
         Latch latch = new RealLatch(partitions.size());
 
         /* display initial stage */
@@ -57,17 +57,16 @@ public class MasterAgent extends Thread {
             WorkerAgent worker = new WorkerAgent(simulationData, partition, endForceComputationBarrier, latch, iterationTracker);
             worker.start();
         }
-        simulationLoop(endForceComputationBarrier, latch);
+        simulationLoop(latch);
     }
 
-    private void simulationLoop(CyclicBarrier endForceComputationBarrier, Latch latch) {
+    private void simulationLoop(Latch latch) {
         while (!simulationData.isOver()) {
             try {
                 isRunningFlag.awaitSet();
 
                 iterationTracker.setCurrentIteration(simulationData.getCurrentIteration());
 
-                endForceComputationBarrier.hitAndWaitAll();
                 latch.await();
                 latch.resetCount();
 
