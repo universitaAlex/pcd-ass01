@@ -1,13 +1,12 @@
 package pcd.ass01.parallel;
 
-import pcd.ass01.model.ConsoleSimulationDisplay;
-import pcd.ass01.model.NoOpSimulationDisplay;
-import pcd.ass01.model.SimulationDisplay;
-import pcd.ass01.parallel.model.SimulationData;
-import pcd.ass01.parallel.model.SimulationDataFactory;
+import pcd.ass01.ui.ConsoleSimulationDisplay;
+import pcd.ass01.ui.NoOpSimulationDisplay;
+import pcd.ass01.ui.SimulationDisplay;
+import pcd.ass01.model.SimulationData;
+import pcd.ass01.model.SimulationDataFactory;
 import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.parallel.speed_test.SpeedTestUtils;
-import pcd.ass01.ui.SimulationView;
 
 import java.util.List;
 import java.util.stream.Stream;

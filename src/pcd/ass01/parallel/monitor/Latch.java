@@ -1,4 +1,4 @@
-package pcd.ass01.parallel.monitor.latch;
+package pcd.ass01.parallel.monitor;
 
 public interface Latch {
 

@@ -1,6 +1,6 @@
 package pcd.ass01.parallel;
 
-import pcd.ass01.parallel.model.SimulationDataFactory;
+import pcd.ass01.model.SimulationDataFactory;
 import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.ui.SimulationView;
 

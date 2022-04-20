@@ -1,4 +1,7 @@
-package pcd.ass01.model;
+package pcd.ass01.ui;
+
+import pcd.ass01.model.Body;
+import pcd.ass01.model.Boundary;
 
 import java.util.Collection;
 

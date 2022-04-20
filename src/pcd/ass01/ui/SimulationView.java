@@ -3,7 +3,6 @@ package pcd.ass01.ui;
 import pcd.ass01.model.Body;
 import pcd.ass01.model.Boundary;
 import pcd.ass01.model.P2d;
-import pcd.ass01.model.SimulationDisplay;
 
 import javax.swing.*;
 import java.awt.*;

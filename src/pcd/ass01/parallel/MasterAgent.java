@@ -1,14 +1,14 @@
 package pcd.ass01.parallel;
 
 import pcd.ass01.model.Body;
-import pcd.ass01.model.SimulationDisplay;
-import pcd.ass01.parallel.model.SimulationData;
+import pcd.ass01.ui.SimulationDisplay;
+import pcd.ass01.model.SimulationData;
 import pcd.ass01.parallel.monitor.CyclicBarrier;
 import pcd.ass01.parallel.monitor.Flag;
 import pcd.ass01.parallel.monitor.IterationTracker;
 import pcd.ass01.parallel.monitor.RealCyclicBarrier;
-import pcd.ass01.parallel.monitor.latch.Latch;
-import pcd.ass01.parallel.monitor.latch.RealLatch;
+import pcd.ass01.parallel.monitor.Latch;
+import pcd.ass01.parallel.monitor.RealLatch;
 
 import java.util.List;
 

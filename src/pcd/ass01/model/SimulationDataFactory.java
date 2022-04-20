@@ -1,9 +1,4 @@
-package pcd.ass01.parallel.model;
-
-import pcd.ass01.model.Body;
-import pcd.ass01.model.Boundary;
-import pcd.ass01.model.P2d;
-import pcd.ass01.model.V2d;
+package pcd.ass01.model;
 
 import java.util.ArrayList;
 import java.util.List;

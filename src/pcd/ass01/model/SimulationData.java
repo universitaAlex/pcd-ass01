@@ -1,4 +1,4 @@
-package pcd.ass01.parallel.model;
+package pcd.ass01.model;
 
 import pcd.ass01.model.Body;
 import pcd.ass01.model.Boundary;
